@@ -1,15 +1,14 @@
 var screen_width=1024; //x
 var screen_height=600; //y
-var cars = [];
 
 function setup() {
+    debug_say("Setup()!");
     createCanvas(screen_width,screen_height);
     frameRate(60);
     textSize(32);
     for(var i=0; i<10;i++){
-      cars.push(new Jitter());
+      cars.push(new Jitter(i));
     }
-
 }
 //coordinates
 //left-left = 0,230
@@ -27,71 +26,75 @@ function draw(){
     debug_info();
     drawRoads();
     for(var i=0; i<spawn; i++){
+      cars[i].touch();
       cars[i].move();
       cars[i].display();
     }
     if(frametime > 200){
-      if(spawn == cars.length){}
-      else{spawn+=1;}
+      if(spawn != cars.length){spawn+=1;}
       frametime=0;
-      debug_say("spawn:"+spawn+" more than 200");
     }
     frametime++;
-    debug_say(spawn);
 }
 var car_location_array= ["left","right","up","down"];
 var car_size=25;
-var car_speed=10;
+var car_speed=2;
+var cars = [];
 
-function Jitter(){
-  var car_location = random(car_location_array);
-  debug_say("Car location:"+car_location);
-  if(car_location == "left"){
+function Jitter(id){
+  this.id = id
+  this.carlocation_start = random(car_location_array);
+  debug_say("Car location:"+this.carlocation_start);
+  if(this.carlocation_start == "left"){
     this.x=0;
     this.y=330;
   }
-  if(car_location == "right"){
+  if(this.carlocation_start == "right"){
     this.x=screen_width-car_size;
     this.y=230;
   }
-  if(car_location == "up"){
+  if(this.carlocation_start == "up"){
     this.x=384+50;
     this.y=0;
   }
-  if(car_location == "down"){
+  if(this.carlocation_start == "down"){
     this.x=384+128+50;
     this.y=screen_height-car_size;
   }
 
   this.size = car_size;
   this.speed = car_speed;
-
+  this.touch = function(){
+    var temparray = cars;
+  }
   this.move = function(){
-    if(car_location == "left"){
+    if(this.carlocation_start == "left"){
       if(this.x > screen_width){this.x=0;}
       this.x += this.speed;
     }
-    if(car_location == "right"){
+    if(this.carlocation_start == "right"){
       if(this.x < 0){this.x=screen_width-car_size;}
       this.x -= this.speed;
     }
-    if(car_location == "up"){
+    if(this.carlocation_start == "up"){
       if(this.y > screen_height){this.y=0;}
       this.y += this.speed;
     }
-    if(car_location == "down"){
+    if(this.carlocation_start == "down"){
       if(this.y < 0){this.y=screen_height-car_size;}
       this.y -= this.speed;
     }
 
   };
-
   this.display = function(){
     rect(this.x,this.y,this.size,this.size);
+    if(int(mouseX)<=this.x+car_size && int(mouseX)>=this.x ){
+      debug_say("Touched id:"+this.id);
+    }
   };
 }
 function debug_say(what){
-  //console.log(what);
+  console.log(what);
 }
 function debug_info(){
   text("DEBUG: 0.1b - "+int(frameRate())+"fps",0,32);
